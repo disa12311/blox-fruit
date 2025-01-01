@@ -1,0 +1,53 @@
+-- Blox Fruits Auto-Farming Script
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Configuration
+local farmingTarget = "Fruit" -- Change to "Enemy" or other targets as needed
+local farmingSpeed = 16 -- Speed of movement
+local farmingDuration = 60 -- Duration in seconds
+
+-- Function to move to a target
+local function moveTo(target)
+    humanoid:MoveTo(target.Position)
+end
+
+-- Function to collect fruits
+local function collectFruits()
+    for _, item in pairs(workspace:GetChildren()) do
+        if item:IsA("Part") and item.Name == farmingTarget then
+            moveTo(item)
+            wait(1) -- Wait for a second to simulate collection time
+            print("Collected: " .. item.Name)
+        end
+    end
+end
+
+-- Function to defeat enemies
+local function defeatEnemies()
+    for _, enemy in pairs(workspace:GetChildren()) do
+        if enemy:IsA("Model") and enemy.Name == "Enemy" then
+            moveTo(enemy)
+            humanoid:MoveTo(enemy.Position)
+            wait(1) -- Simulate attack time
+            print("Defeated: " .. enemy.Name)
+        end
+    end
+end
+
+-- Main farming loop
+local function startFarming()
+    local endTime = tick() + farmingDuration
+    while tick() < endTime do
+        if farmingTarget == "Fruit" then
+            collectFruits()
+        elseif farmingTarget == "Enemy" then
+            defeatEnemies()
+        end
+        wait(2) -- Wait before the next action
+    end
+end
+
+-- Start the farming process
+startFarming()
