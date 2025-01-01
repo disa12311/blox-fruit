@@ -1,0 +1,53 @@
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local DashTime = 0.3
+local DashSpeed = 70
+local isDashing = false
+
+-- Function to handle the dash
+local function dash()
+    if isDashing then return end
+    isDashing = true
+
+    -- Create a tween to move the player forward
+    local dashTween = TweenService:Create(humanoidRootPart, TweenInfo.new(DashTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+        Position = humanoidRootPart.Position + (humanoidRootPart.CFrame.LookVector * DashSpeed)
+    })
+    
+    dashTween:Play()
+    
+    -- Optional: Create a trail effect
+    local trail = Instance.new("Trail")
+    trail.Parent = humanoidRootPart
+    trail.Lifetime = 0.5
+    trail.Color = ColorSequence.new(Color3.new(1, 1, 1)) -- White trail
+    trail.Enabled = true
+
+    -- Wait for the dash to complete
+    wait(DashTime)
+    
+    -- Clean up the trail
+    trail:Destroy()
+    isDashing = false
+end
+
+-- Input handling for dashing
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        dash()
+    end
+end)
+
+-- Optional: Prevent falling during dash
+RunService.RenderStepped:Connect(function()
+    if isDashing then
+        humanoidRootPart.Velocity = Vector3.new(humanoidRootPart.Velocity.X, 0, humanoidRootPart.Velocity.Z) -- Prevent falling
+    end
+end)
