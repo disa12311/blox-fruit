@@ -1,0 +1,95 @@
+-- Blox Fruits Auto-Farming and Fruit Collection Script
+
+-- Function to get the player's current level
+function getPlayerLevel()
+    -- Assuming there's a method to get the player's level
+    return game.Players.LocalPlayer.Level
+end
+
+-- Function to auto-farm NPCs based on player level
+function autoFarmNpcs()
+    local playerLevel = getPlayerLevel()
+    local quest = selectQuest(playerLevel) -- Function to select appropriate quest
+
+    if quest then
+        navigateToNpc(quest.npc) -- Navigate to the NPC location
+        engageNpc(quest.npc) -- Engage the NPC for combat
+    else
+        print("No suitable quest found for level: " .. playerLevel)
+    end
+end
+
+-- Function to select a quest based on player level
+function selectQuest(level)
+    -- Example quest selection logic
+    local quests = {
+        {level = 1, npc = "QuestGiver1"},
+        {level = 10, npc = "QuestGiver2"},
+        {level = 20, npc = "QuestGiver3"},
+        -- Add more quests as needed
+    }
+
+    for _, quest in ipairs(quests) do
+        if level >= quest.level then
+            return quest
+        end
+    end
+    return nil
+end
+
+-- Function to navigate to the NPC
+function navigateToNpc(npcName)
+    local npc = game.Workspace:FindFirstChild(npcName)
+    if npc then
+        -- Move to NPC's position
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.CFrame
+    else
+        print("NPC not found: " .. npcName)
+    end
+end
+
+-- Function to engage the NPC in combat
+function engageNpc(npcName)
+    local npc = game.Workspace:FindFirstChild(npcName)
+    if npc then
+        -- Example combat logic
+        while npc and npc.Health > 0 do
+            -- Attack the NPC
+            game.Players.LocalPlayer.Character:FindFirstChild("Attack").Value = true
+            wait(1) -- Wait for a second before the next attack
+        end
+        print("Quest completed for NPC: " .. npcName)
+    end
+end
+
+-- Function to continuously collect fruits
+function collectFruits()
+    while true do
+        for _, fruit in pairs(workspace:GetChildren()) do
+            if fruit:IsA("Fruit") and fruit.Position.Y < 0 then -- Assuming fruits are below ground level
+                navigateToFruit(fruit)
+                collectFruit(fruit)
+            end
+        end
+        wait(5) -- Wait before scanning again
+    end
+end
+
+-- Function to navigate to the fruit's location
+function navigateToFruit(fruit)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = fruit.CFrame
+end
+
+-- Function to collect the fruit
+function collectFruit(fruit)
+    -- Assuming there's a method to collect the fruit
+    fruit:Destroy() -- Simulate collecting the fruit
+    print("Collected fruit: " .. fruit.Name)
+end
+
+-- Start the auto-farming and fruit collection
+while true do
+    autoFarmNpcs()
+    collectFruits()
+    wait(10) -- Wait before the next cycle
+end
